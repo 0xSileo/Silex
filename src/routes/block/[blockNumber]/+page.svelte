@@ -4,7 +4,7 @@
 
   $: previousBlockNumber = data.blockNumber > 0 ? data.blockNumber - 1 : null
   $: nextBlockNumber = previousBlockNumber + 2 <= data.currentBlockNumber ? previousBlockNumber + 2 : null
-  
+
   function camelToHuman(camelStr) {
     if (!camelStr) return '';
 
@@ -26,9 +26,7 @@
 <a href="/block/{nextBlockNumber}">Next</a>
 {/if}
 
-
-
-<h1>Details for block </h1>
+<h1>Details for block {parseInt(data.block['number'])} </h1>
 
 <table>
   <thead>
@@ -60,7 +58,7 @@
     </tr>
   </thead>
   <tbody>
-      {#each Object.entries(data.block) as [key, value] (key)}
+    {#each Object.entries(data.block) as [key, value] (key)}
       <tr>
         <td>{camelToHuman(key)}</td>
 
@@ -72,15 +70,15 @@
 
         {:else if key === 'transactions'}
           <td colspan="2">
-        <table>
+            <table>
               <tbody>
-          {#each value as txHash}
-            <tr>
-              <td><a href="/tx/{txHash}"><code>{txHash}</code></a></td>
-            </tr>
-          {/each}
+                {#each value as txHash}
+                  <tr>
+                    <td><a href="/tx/{txHash}"><code>{txHash}</code></a></td>
+                  </tr>
+                {/each}
               </tbody>
-        </table>
+            </table>
           </td>
 
         {:else if key === 'number' || key === 'gasLimit' || key === 'gasUsed' || key === 'timestamp' || key === 'size'}
@@ -89,7 +87,7 @@
         {:else}
           <td><code>{value}</code></td>
         {/if}
-  
+
       </tr>
     {/each}
   </tbody>

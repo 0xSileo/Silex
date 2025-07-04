@@ -64,6 +64,7 @@ async function sendRequest(method,params) {
       if (response.ok) {
         const data = await response.json();
         console.log("Response:", data);
+        console.log("Response result", data.result)
         return data.result; // Return the data from the function
       } else {
         console.error("Error:", response.statusText);

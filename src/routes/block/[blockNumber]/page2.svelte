@@ -4,7 +4,6 @@
 
   $: previousBlockNumber = data.blockNumber > 0 ? data.blockNumber - 1 : null
   $: nextBlockNumber = previousBlockNumber + 2 <= data.currentBlockNumber ? previousBlockNumber + 2 : null
-  
 
   function camelToHuman(camelStr) {
     if (!camelStr) return '';
