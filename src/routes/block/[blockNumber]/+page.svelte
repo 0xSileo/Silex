@@ -51,31 +51,38 @@
     </tr>
   </thead>
   <tbody>
-    <ul>
       {#each Object.entries(data.block) as [key, value] (key)}
       <tr>
         <td>{key}</td>
-        {#if key=='parentHash' && value != '0x0000000000000000000000000000000000000000000000000000000000000000'}
+
+        {#if key === 'parentHash' && value !== '0x0000000000000000000000000000000000000000000000000000000000000000'}
           <td><code><a href="/block/{value}">{value}</a></code></td>
-        {:else if key=='miner' && value != '0x0000000000000000000000000000000000000000'}
+
+        {:else if key === 'miner' && value !== '0x0000000000000000000000000000000000000000'}
           <td><code><a href="/address/{value}">{value}</a></code></td>
-          {:else if key=='transactions'}
+
+        {:else if key === 'transactions'}
+          <td colspan="2">
         <table>
+              <tbody>
           {#each value as txHash}
             <tr>
               <td><a href="/tx/{txHash}"><code>{txHash}</code></a></td>
             </tr>
           {/each}
+              </tbody>
         </table>
-        {:else if key=='number' || key=='gasLimit' || key=='gasUsed' || key=='timestamp' || key=='size'}
+          </td>
+
+        {:else if key === 'number' || key === 'gasLimit' || key === 'gasUsed' || key === 'timestamp' || key === 'size'}
           <td>{parseInt(value)}</td>
+
         {:else}
           <td><code>{value}</code></td>
         {/if}
   
       </tr>
     {/each}
-    </ul>
   </tbody>
 </table>
 
