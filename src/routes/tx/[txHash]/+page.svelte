@@ -1,6 +1,17 @@
 <script>
     export let data;
-    const numberKeys = ["nonce","transactionIndex","value","gasPrice","gas","maxFeePerGas","maxPriorityFeePerGas","type"]
+    const numberKeys = ["nonce","transactionIndex","value","gasPrice","gas","maxFeePerGas","maxPriorityFeePerGas","type"];
+
+
+    function camelToHuman(camelStr) {
+      if (!camelStr) return '';
+
+      const words = camelStr
+        .replace(/([A-Z])/g, ' $1')     // insert space before uppercase letters
+        .toLowerCase();                 // convert entire string to lowercase
+
+      return words.charAt(0).toUpperCase() + words.slice(1);
+    }
 </script>
 
 Transaction details
@@ -16,7 +27,7 @@ Transaction details
         <ul>
         {#each Object.entries(data.tx) as [key, value] (key)}
         <tr>
-          <td>{key}</td>
+          <td>{camelToHuman(key)}</td>
           {#if numberKeys.includes(key)}
           <td>{parseInt(value)}</td>
           {:else if key=="blockHash"}

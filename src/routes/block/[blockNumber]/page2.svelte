@@ -5,6 +5,17 @@
   $: previousBlockNumber = data.blockNumber > 0 ? data.blockNumber - 1 : null
   $: nextBlockNumber = previousBlockNumber + 2 <= data.currentBlockNumber ? previousBlockNumber + 2 : null
   
+
+  function camelToHuman(camelStr) {
+    if (!camelStr) return '';
+
+    const words = camelStr
+      .replace(/([A-Z])/g, ' $1')     // insert space before uppercase letters
+      .toLowerCase();                 // convert entire string to lowercase
+
+    return words.charAt(0).toUpperCase() + words.slice(1);
+  }
+  
 </script>
 
 
@@ -29,7 +40,7 @@
     <ul>
       {#each Object.entries(data.block) as [key, value] (key)}
       <tr>
-        <td>{key}</td>
+        <td>{camelToHuman(key)}</td>
         {#if key=='parentHash' && value != '0x0000000000000000000000000000000000000000000000000000000000000000'}
           <td><code><a href="/block/{value}">{value}</a></code></td>
         {:else if key=='miner' && value != '0x0000000000000000000000000000000000000000'}
