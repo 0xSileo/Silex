@@ -1,17 +1,8 @@
 <script>
-    export let data;
+  import { camelToHuman } from '$lib/utils/utils'
 
-  function camelToHuman(camelStr) {
-    if (!camelStr) return '';
-
-    const words = camelStr
-      .replace(/([A-Z])/g, ' $1')     // insert space before uppercase letters
-      .toLowerCase();                 // convert entire string to lowercase
-
-    return words.charAt(0).toUpperCase() + words.slice(1);
-  }
+  export let data;
 </script>
-
 
 <table>
   <thead>

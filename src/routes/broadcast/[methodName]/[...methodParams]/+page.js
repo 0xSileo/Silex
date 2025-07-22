@@ -1,4 +1,5 @@
 import openrpc from '../../../../openrpc.json';
+import { sendRequest } from '/src/lib/utils/utils';
 
 export async function load({ params }) {
 
@@ -45,15 +46,11 @@ export async function load({ params }) {
     }
 }
 
-
 function validateParams(paramObj,methodParams) {
     methodParams.forEach((givenParam) => {
         
     })
 }
-
-
-
 
 function retreiveType(paramObj) {
     console.log(paramObj)
@@ -65,35 +62,3 @@ function retreiveType(paramObj) {
     }
     console.log(paramTypes)
 }
-
-
-async function sendRequest(methodName, methodParams) {
-    const jsonRpcRequest = {
-      jsonrpc: "2.0",
-      method: methodName,
-      params: methodParams,
-      id: 2,
-    };
-
-    try {
-      const response = await fetch("http://127.0.0.1:8545", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(jsonRpcRequest),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Response:", data);
-        return data; // Return the data from the function
-      } else {
-        console.error("Error:", response.statusText);
-        return null; // Handle error case appropriately
-      }
-    } catch (error) {
-      console.error("Error:", error.message);
-      return null; // Handle error case appropriately
-    }
-  }

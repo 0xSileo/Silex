@@ -1,20 +1,11 @@
 <script>
+  import { camelToHuman } from '$lib/utils/utils'
 
   export let data;
 
   $: previousBlockNumber = data.blockNumber > 0 ? data.blockNumber - 1 : null
   $: nextBlockNumber = previousBlockNumber + 2 <= data.currentBlockNumber ? previousBlockNumber + 2 : null
 
-  function camelToHuman(camelStr) {
-    if (!camelStr) return '';
-
-    const words = camelStr
-      .replace(/([A-Z])/g, ' $1')     // insert space before uppercase letters
-      .toLowerCase();                 // convert entire string to lowercase
-
-    return words.charAt(0).toUpperCase() + words.slice(1);
-  }
-  
 </script>
 
 
@@ -25,8 +16,6 @@
 {#if nextBlockNumber != null}
 <a href="/block/{nextBlockNumber}">Next</a>
 {/if}
-
-
 
 <table>
   <thead>
