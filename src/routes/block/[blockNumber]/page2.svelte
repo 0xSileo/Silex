@@ -53,8 +53,12 @@
             </tr>
           {/each}
         </table>
-        {:else if key=='number' || key=='gasLimit' || key=='gasUsed' || key=='timestamp' || key=='size'}
-          <td>{parseInt(value)}</td>
+          {:else if key === 'number' || key === 'gasLimit' || key === 'gasUsed'  || key === 'size'}
+            <td>{parseInt(value)}</td>
+
+          {:else if key === 'timestamp'}
+            <td>{Date(parseInt(value) * 1000)}</td>
+
         {:else}
           <td><code>{value}</code></td>
         {/if}
