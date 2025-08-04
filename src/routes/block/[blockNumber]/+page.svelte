@@ -111,6 +111,8 @@
 
           {:else if key === 'number' || key === 'gasLimit' || key === 'gasUsed'  || key === 'size'}
             <td>{parseInt(value)}</td>
+          {:else if key === 'baseFeePerGas'}
+            <td>{parseInt(value)/10**9} gwei</td>
 
           {:else if key === 'timestamp'}
             <td>{Date(parseInt(value) * 1000)}</td>
