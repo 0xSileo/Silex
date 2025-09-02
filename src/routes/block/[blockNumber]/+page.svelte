@@ -78,6 +78,25 @@
     </tbody>
   </table>
 
+  {#if data.baseFeeCheck}
+  <h3>Base Fee Verification</h3>
+
+  Next block will have a base fee of {parseInt(data.nextBaseFee.next)/1e9} gwei
+
+  {#if data.baseFeeCheck.valid}
+    <p style="color: green">✅ Base fee is correct<br>
+      Expected: {parseInt(data.baseFeeCheck.expected)/1e9} gwei<br>
+      Actual: {parseInt(data.baseFeeCheck.actual)/1e9} gwei
+    </p>
+  {:else}
+    <p style="color: red">
+      ❌ Base fee is incorrect<br>
+      Expected: {parseInt(data.baseFeeCheck.expected)/1e9} gwei<br>
+      Actual: {parseInt(data.baseFeeCheck.actual)/1e9} gwei
+    </p>
+  {/if}
+{/if}
+
   <table>
     <thead>
       <tr>
@@ -126,8 +145,6 @@
     </tbody>
   </table>
 {/if}
-
-
 
 <style>
 
