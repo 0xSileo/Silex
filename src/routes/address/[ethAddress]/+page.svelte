@@ -1,5 +1,5 @@
 <script>
-  import { camelToHuman } from '$lib/utils/utils'
+  import { camelToHuman } from '$lib/utils/utils';
 
   export let data;
 </script>
