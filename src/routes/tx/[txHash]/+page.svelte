@@ -33,7 +33,7 @@ Transaction details
           {:else if key=="blockHash"}
           <td><code><a href="/block/{value}">{value}</a></code></td>
           {:else if key=="blockNumber"}
-          <td><a href="/block/{value}">{parseInt(value)}</a></td>
+          <td><a href="/block/{parseInt(value)}">{parseInt(value)}</a></td>
           {:else if key=="from" || key=="to"}
           <td><code><a href="/address/{value}">{value}</a></code></td>
           {:else}

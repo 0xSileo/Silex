@@ -56,7 +56,7 @@ export async function getTransactionCount(ethAddress) {
   return txCount
 }
 
-async function getTransactionByHash(txHash) {
+export async function getTransactionByHash(txHash) {
   const method = "eth_getTransactionByHash"
   const params = [txHash]
 
@@ -113,7 +113,7 @@ export async function sendRequest(method,params) {
 
     if (response.ok) {
       const data = await response.json();
-      console.log("Response:", data);
+      //console.log("Response:", data);
       return data.result; // Return the data from the function
     } else {
       console.error("Error:", response.statusText);

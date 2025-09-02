@@ -1,7 +1,8 @@
-import { getTransactionByHash } from "/src/lib/utils/utils";
+import { getTransactionByHash } from '$lib/utils/utils';
 
 export async function load({ params }) {
     const txHash = params.txHash;
+    console.log("ok")
     const tx = await getTransactionByHash(txHash)
     console.log(tx)
 
