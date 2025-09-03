@@ -123,6 +123,8 @@
           
           {:else if key === 'number' || key === 'gasLimit' || key === 'blobGasUsed'}
             <td>{parseInt(value)}</td>
+          {:else if key === 'gasUsed'}
+            <td>{parseInt(value)} ({(parseInt(value)/parseInt(data.block.gasLimit)*100).toFixed(2)} % of gas limit)</td>
           {:else if key === 'extraData'}
             <td>{hexToAscii(value)}</td>
           {:else if key === 'baseFeePerGas'}
