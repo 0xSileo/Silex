@@ -127,6 +127,16 @@ export async function sendRequest(method,params) {
   }
 }
 
+export function hexToAscii(hex) {
+    hex = hex.startsWith('0x') ? hex.slice(2) : hex;
+
+    // Convert to Uint8Array
+    const bytes = new Uint8Array(hex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+
+    // Decode using TextDecoder
+    return new TextDecoder().decode(bytes);
+  }
+
 function toBigInt(value) {
   // Handle both decimal and hex strings
   if (typeof value === "string") {

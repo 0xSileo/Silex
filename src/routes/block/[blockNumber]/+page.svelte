@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-  import { camelToHuman, BLOCK_TIME } from '$lib/utils/utils';
+  import { camelToHuman, BLOCK_TIME, hexToAscii } from '$lib/utils/utils';
 
   export let data;
 
@@ -120,6 +120,8 @@
 
           {:else if key === 'number' || key === 'gasLimit' || key === 'gasUsed'  || key === 'size'}
             <td>{parseInt(value)}</td>
+          {:else if key === 'extraData'}
+            <td>{hexToAscii(value)}</td>
           {:else if key === 'baseFeePerGas'}
             <td>
               {parseInt(value)/10**9} gwei
