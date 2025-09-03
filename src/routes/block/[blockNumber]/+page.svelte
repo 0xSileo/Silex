@@ -184,6 +184,20 @@
       {/each}
     </tbody>
   </table>
+
+  <h2>
+    Block receipts
+  </h2>
+    {#if data.blockReceipts !== undefined}
+      {#each Object.entries(data.blockReceipts) as [key, value] (key)}
+        {key}
+        <br>
+        {value}
+      {/each}
+    {:else}
+      <p>Could not fetch block receipts</p>
+    {/if}
+
 {/if}
 
 <style>

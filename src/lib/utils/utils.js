@@ -48,6 +48,11 @@ export async function getBlockNumber() {
   return parseInt(result);
 }
 
+export async function getBlockReceipts(blockNumber) {
+  const result = await sendRequest('eth_getBlockReceipts', [blockNumber]);
+  return result;
+}
+
 export async function getCode(ethAddress) {
   return await sendRequest('eth_getCode', [ethAddress, 'latest']);
 }

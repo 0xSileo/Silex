@@ -1,4 +1,4 @@
-import { getBlockNumber, isDecimalUint, isBytes32Hex, getBlockByNumber, getBlockByHash, verifyBaseFeeEIP1559, nextEIP1559BaseFee } from "/src/lib/utils/utils";
+import { getBlockNumber, isDecimalUint, isBytes32Hex, getBlockByNumber, getBlockByHash, verifyBaseFeeEIP1559, nextEIP1559BaseFee, getBlockReceipts } from "/src/lib/utils/utils";
 
 export async function load({ params }) {
 
@@ -39,10 +39,13 @@ export async function load({ params }) {
   // Fetch the parent block if not genesis
   let baseFeeCheck = null;
   let nextBaseFee = null;
+  let blockReceipts = null;
   if (blockNumber > 0 && blockNumber <= currentBlockNumber ) {
     const parentBlock = await getBlockByNumber(blockNumber - 1);
     baseFeeCheck = verifyBaseFeeEIP1559(parentBlock, block);
     nextBaseFee = nextEIP1559BaseFee(block)
+    
+    blockReceipts = await getBlockReceipts(blockNumber)
   }
 
   return {
