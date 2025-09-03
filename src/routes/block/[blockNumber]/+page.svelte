@@ -139,6 +139,7 @@
             </td>
 
           {:else if key === 'timestamp'}
+            <td>{new Date(parseInt(value) * 1000)}</td>
 
              {:else if key === 'withdrawals'}
             <td>
