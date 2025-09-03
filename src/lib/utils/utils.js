@@ -1,3 +1,5 @@
+export const BLOCK_TIME = 12; // seconds
+
 export function isDecimalUint(str) {
   // Define a regular expression to match decimal unsigned integers
   // ^ asserts the start of the string

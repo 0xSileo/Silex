@@ -1,11 +1,12 @@
 <script>
   import { onMount } from 'svelte';
-  import { camelToHuman } from '$lib/utils/utils';
+  import { camelToHuman, BLOCK_TIME } from '$lib/utils/utils';
 
   export let data;
 
   let latestBlockNumber = data.currentBlockNumber;
-
+  let etaTimestamp;
+  
     // Updating to latest block number with a websocket
     onMount(() => {
         const ws = new WebSocket('ws://127.0.0.1:8545');
@@ -35,6 +36,13 @@
 
   $: blockInTheFuture = data.blockNumber > latestBlockNumber
 
+  $: if (blockInTheFuture) {
+    let approximateSecondsDelta = (data.blockNumber - latestBlockNumber)*BLOCK_TIME
+    let currentBlockTimestamp = parseInt(data.currentBlock.timestamp)
+
+    etaTimestamp = currentBlockTimestamp + approximateSecondsDelta
+  }
+
   $: if (!blockInTheFuture && !data.block) {
     location.reload();
   }
@@ -43,7 +51,7 @@
 
 {#if blockInTheFuture}
   <h1>Block {data.blockNumber} is in the future</h1>
-  <p>Waiting for it to be mined... Current block is  <a href="/block/{latestBlockNumber}">{latestBlockNumber}</a>.</p>
+  <p>Waiting for it to be mined... Current block is  <a href="/block/{latestBlockNumber}">{latestBlockNumber}</a>. If all slots are filled, the block should be mined on {new Date(etaTimestamp*1000)}</p>
 {:else}
   {#if previousBlockNumber != null}
     <a href="/block/{previousBlockNumber}">Previous</a>

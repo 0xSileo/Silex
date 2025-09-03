@@ -34,11 +34,12 @@ export async function load({ params }) {
   }
 
   const currentBlockNumber = await getBlockNumber();
+  const currentBlock = await getBlockByNumber(currentBlockNumber)
 
   // Fetch the parent block if not genesis
   let baseFeeCheck = null;
   let nextBaseFee = null;
-  if (blockNumber > 0) {
+  if (blockNumber > 0 && blockNumber <= currentBlockNumber ) {
     const parentBlock = await getBlockByNumber(blockNumber - 1);
     baseFeeCheck = verifyBaseFeeEIP1559(parentBlock, block);
     nextBaseFee = nextEIP1559BaseFee(block)
@@ -48,6 +49,7 @@ export async function load({ params }) {
     block,
     blockNumber,
     currentBlockNumber,
+    currentBlock,
     requestedLatestBlock,
     baseFeeCheck,
     nextBaseFee
