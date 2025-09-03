@@ -17,6 +17,9 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"plotly.js-dist-min": "^3.1.0"
+		"keccak": "^3.0.4",
+		"plotly.js-dist-min": "^3.1.0",
+		"rlp": "^3.0.0",
+		"secp256k1": "^5.0.1"
 	}
 }

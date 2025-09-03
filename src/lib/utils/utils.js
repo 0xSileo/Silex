@@ -1,3 +1,7 @@
+import secp256k1 from 'secp256k1';
+import Keccak from 'keccak';
+import rlp from 'rlp';
+
 export const BLOCK_TIME = 12; // seconds
 
 export function isDecimalUint(str) {
@@ -227,4 +231,76 @@ export function nextEIP1559BaseFee(parent) {
   return {
     next: expectedBaseFee.toString()
   };
+}
+
+
+
+/** Helper: Normalize hex string to 32-byte Uint8Array */
+function hexTo32ByteBuffer(hex) {
+  const cleaned = hex.replace(/^0x/, '').padStart(64, '0');
+  return Uint8Array.from(Buffer.from(cleaned, 'hex'));
+}
+
+/**
+ * Verify EIP-1559 transaction signature
+ * @param {object} txObj
+ * @returns {{ recoveredAddress: string, valid: boolean|null, error?: string }}
+ */
+export function verifyTransactionSignature(txObj) {
+  try {
+    const toBuf = Buffer.isBuffer(txObj.to)
+      ? txObj.to
+      : Buffer.from(txObj.to?.replace(/^0x/, '') || '', 'hex');
+
+    const inputBuf = Buffer.isBuffer(txObj.input)
+      ? txObj.input
+      : Buffer.from(txObj.input?.replace(/^0x/, '') || '', 'hex');
+
+    const rBuf = Buffer.isBuffer(txObj.r)
+      ? Uint8Array.from(txObj.r)
+      : hexTo32ByteBuffer(txObj.r);
+
+    const sBuf = Buffer.isBuffer(txObj.s)
+      ? Uint8Array.from(txObj.s)
+      : hexTo32ByteBuffer(txObj.s);
+
+    const unsignedTx = [
+      txObj.chainId,
+      txObj.nonce,
+      BigInt(txObj.maxPriorityFeePerGas),
+      BigInt(txObj.maxFeePerGas),
+      BigInt(txObj.gas),
+      toBuf,
+      BigInt(txObj.value),
+      inputBuf,
+      txObj.accessList || [],
+    ];
+
+    const rlpEncoded = rlp.encode(unsignedTx);
+    const payload = Buffer.concat([Buffer.from([0x02]), rlpEncoded]);
+
+    const msgHash = Uint8Array.from(new Keccak('keccak256').update(payload).digest());
+    const signature = new Uint8Array([...rBuf, ...sBuf]);
+
+    const recovery = parseInt(txObj.yParity);
+
+    const pubKey = secp256k1.ecdsaRecover(signature, recovery, msgHash, false);
+    const pubKeyUncompressed = pubKey.slice(1); // remove 0x04 prefix
+
+    const addressBuf = new Keccak('keccak256')
+      .update(Buffer.from(pubKeyUncompressed))
+      .digest()
+      .slice(-20);
+
+    const recoveredAddress = '0x' + Buffer.from(addressBuf).toString('hex');
+
+    const expectedAddress = txObj.from?.toLowerCase();
+    const valid = expectedAddress
+      ? recoveredAddress.toLowerCase() === expectedAddress
+      : null;
+
+    return { recoveredAddress, valid };
+  } catch (error) {
+    return { error: error.message };
+  }
 }

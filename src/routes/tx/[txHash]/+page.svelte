@@ -43,5 +43,13 @@ Transaction details
 
       </tr>
       {/each}
+
+      {#if data.txVerification.valid}
+        <p style="color: green">✅ Transaction signature is verified.</p>
+      {:else}
+        <p style="color: red">
+          ❌ Transaction signature couldn't be verified: recovered address is {data.txVerification.recoveredAddress}
+        </p>
+      {/if}
     </tbody>
   </table>
