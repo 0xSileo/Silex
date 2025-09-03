@@ -118,7 +118,10 @@
               {/if}
             </td>
 
-          {:else if key === 'number' || key === 'gasLimit' || key === 'gasUsed'  || key === 'size'}
+          {:else if key === 'size'}
+            <td>{parseInt(value)} bytes</td>
+          
+          {:else if key === 'number' || key === 'gasLimit' || key === 'blobGasUsed'}
             <td>{parseInt(value)}</td>
           {:else if key === 'extraData'}
             <td>{hexToAscii(value)}</td>
