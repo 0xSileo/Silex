@@ -5,6 +5,10 @@
   export let data;
 
   let latestBlockNumber = data.currentBlockNumber;
+  let showTransactions = false;
+  let showWithdrawals = false;
+  let showLogsBloom = false;
+
   let etaTimestamp;
   
     // Updating to latest block number with a websocket
@@ -78,17 +82,40 @@
           {:else if key === 'miner' && value !== '0x0000000000000000000000000000000000000000'}
             <td><code><a href="/address/{value}">{value}</a></code></td>
 
+          {:else if key === 'logsBloom'}
+            <td>
+              <button on:click={() => showLogsBloom = !showLogsBloom}>
+                {showLogsBloom 
+                  ? 'Hide logs bloom' 
+                  : 'Show logs bloom'}
+              </button>
+
+              {#if showLogsBloom}
+                <br>
+                <code>{value}</code>
+              {/if}
+            </td>
+
           {:else if key === 'transactions'}
             <td colspan="2">
-              <table>
-                <tbody>
-                  {#each value as txHash}
-                    <tr>
-                      <td><a href="/tx/{txHash}"><code>{txHash}</code></a></td>
-                    </tr>
-                  {/each}
-                </tbody>
-              </table>
+              <button on:click={() => showTransactions = !showTransactions}>
+                {showTransactions 
+                  ? `Hide ${value.length} transaction hashes` 
+                  : `Show ${value.length} transaction hashes`}
+              </button>
+
+              {#if showTransactions}
+              <br>
+                <table>
+                  <tbody>
+                    {#each value as txHash}
+                      <tr>
+                        <td><a href="/tx/{txHash}"><code>{txHash}</code></a></td>
+                      </tr>
+                    {/each}
+                  </tbody>
+                </table>
+              {/if}
             </td>
 
           {:else if key === 'number' || key === 'gasLimit' || key === 'gasUsed'  || key === 'size'}
@@ -105,7 +132,41 @@
             </td>
 
           {:else if key === 'timestamp'}
-            <td>{Date(parseInt(value) * 1000)}</td>
+
+             {:else if key === 'withdrawals'}
+            <td>
+              <button on:click={() => showWithdrawals = !showWithdrawals}>
+                {showWithdrawals 
+                  ? `Hide ${value.length} withdrawals` 
+                  : `Show ${value.length} withdrawals`}
+              </button>
+
+              {#if showWithdrawals}
+                <br>
+                <table>
+                  <tbody>
+                    {#each value as withdrawal}
+                      <p>
+                        {#each Object.entries(withdrawal) as [fieldKey, fieldValue]}
+                          {camelToHuman(fieldKey)}: 
+                          {#if fieldKey === 'address'}
+                            <td><code><a href="/address/{fieldValue}">{fieldValue}</a></code></td>
+                          {:else if fieldKey === 'amount'}
+                            {parseInt(fieldValue)/1e9}
+                          {:else}
+                            {parseInt(fieldValue)}
+                          {/if}
+                          <br>
+                        {/each}
+                        ----
+                      </p>
+                    {/each}
+                  </tbody>
+                </table>
+              {/if}
+
+
+            </td>
 
           {:else}
             <td><code>{value}</code></td>
