@@ -9,7 +9,7 @@
   // Convert hex to decimal
   const blockData = blocks.map(b => ({
     number: parseInt(b.number, 16),
-    baseFeePerGas: parseInt(b.baseFeePerGas, 16),
+    baseFeePerGas: parseInt(b.baseFeePerGas, 16)/1e9,
     gasUsed: parseInt(b.gasUsed, 16),
     gasLimit: parseInt(b.gasLimit, 16)
   }));
