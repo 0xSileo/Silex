@@ -56,25 +56,9 @@
   <h1>  {#if previousBlockNumber != null}<a href="/block/{previousBlockNumber}">&lt;</a>{/if}  Details for block {parseInt(data.blockNumber)}  {#if nextBlockNumber != null}<a href="/block/{nextBlockNumber}">&gt;</a> --- <a href="/block/latest">&gt;&gt;</a> {/if} </h1>
 
   <!--<h1>Details for block {parseInt(data.block['number'])} </h1>-->
-
-  {#if data.baseFeeCheck}
-  <h3>Base Fee Verification</h3>
-
-  Next block will have a base fee of {parseInt(data.nextBaseFee.next)/1e9} gwei
-
-  {#if data.baseFeeCheck.valid}
-    <p style="color: green">✅ Base fee is correct<br>
-      Expected: {parseInt(data.baseFeeCheck.expected)/1e9} gwei<br>
-      Actual: {parseInt(data.baseFeeCheck.actual)/1e9} gwei
-    </p>
-  {:else}
-    <p style="color: red">
-      ❌ Base fee is incorrect<br>
-      Expected: {parseInt(data.baseFeeCheck.expected)/1e9} gwei<br>
-      Actual: {parseInt(data.baseFeeCheck.actual)/1e9} gwei
-    </p>
+  {#if nextBlockNumber == null}
+    <p style="color:blue">Next block will have a base fee of {parseInt(data.nextBaseFee.next)/1e9} gwei, which will be {parseInt(data.nextBaseFee.next)/1e18*21000} ETH for a simple transfer.</p>
   {/if}
-{/if}
 
   <table>
     <thead>
@@ -110,7 +94,15 @@
           {:else if key === 'number' || key === 'gasLimit' || key === 'gasUsed'  || key === 'size'}
             <td>{parseInt(value)}</td>
           {:else if key === 'baseFeePerGas'}
-            <td>{parseInt(value)/10**9} gwei</td>
+            <td>
+              {parseInt(value)/10**9} gwei
+                {#if data.baseFeeCheck.valid} <span style="color: green">✅ Base fee is verified</span>
+                {:else}
+                  <span style="color: red">
+                    ❌ Couldn't be verified: predicted value is {parseInt(data.baseFeeCheck.expected)/1e9} gwei
+                  </span>
+                {/if}
+            </td>
 
           {:else if key === 'timestamp'}
             <td>{Date(parseInt(value) * 1000)}</td>
