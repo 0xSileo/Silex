@@ -53,18 +53,9 @@
   <h1>Block {data.blockNumber} is in the future</h1>
   <p>Waiting for it to be mined... Current block is  <a href="/block/{latestBlockNumber}">{latestBlockNumber}</a>. If all slots are filled, the block should be mined on {new Date(etaTimestamp*1000)}</p>
 {:else}
-  {#if previousBlockNumber != null}
-    <a href="/block/{previousBlockNumber}">Previous</a>
-  {/if} 
-  ------------------------------- 
-  {#if nextBlockNumber != null}
-    <a href="/block/{nextBlockNumber}">Next</a>
------->
-    <a href="/block/latest">Latest</a>
-  {/if}
+  <h1>  {#if previousBlockNumber != null}<a href="/block/{previousBlockNumber}">&lt;</a>{/if}  Details for block {parseInt(data.blockNumber)}  {#if nextBlockNumber != null}<a href="/block/{nextBlockNumber}">&gt;</a> --- <a href="/block/latest">&gt;&gt;</a> {/if} </h1>
 
   <!--<h1>Details for block {parseInt(data.block['number'])} </h1>-->
-  <h1>Details for block {parseInt(data.blockNumber)} </h1>
 
   <table>
     <thead>
