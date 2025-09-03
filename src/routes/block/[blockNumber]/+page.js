@@ -1,4 +1,4 @@
-import { getBlockNumber, isDecimalUint, isBytes32Hex, getBlockByNumber, getBlockByHash } from "/src/lib/utils/utils";
+import { getBlockNumber, isDecimalUint, isBytes32Hex, getBlockByNumber, getBlockByHash, verifyBaseFeeEIP1559, nextEIP1559BaseFee } from "/src/lib/utils/utils";
 
 export async function load({ params }) {
 
@@ -51,97 +51,5 @@ export async function load({ params }) {
     requestedLatestBlock,
     baseFeeCheck,
     nextBaseFee
-  };
-}
-
-function toBigInt(value) {
-  // Handle both decimal and hex strings
-  if (typeof value === "string") {
-    if (value.startsWith("0x")) {
-      return BigInt(value);
-    } else {
-      return BigInt(parseInt(value));
-    }
-  }
-  return BigInt(value); // for numbers or already BigInt
-}
-
-// Helper: EIP-1559 base fee verification
-function verifyBaseFeeEIP1559(parent, child) {
-  if (!parent.baseFeePerGas || !child.baseFeePerGas) {
-    return {
-      valid: false,
-      reason: "Missing base fee (possibly pre-EIP-1559 block?)"
-    };
-  }
-
-  const parentBaseFee = toBigInt(parent.baseFeePerGas);
-  const parentGasUsed = toBigInt(parent.gasUsed);
-  const parentGasLimit = toBigInt(parent.gasLimit);
-  const childBaseFee = toBigInt(child.baseFeePerGas);
-
-  const targetGas = parentGasLimit / 2n;
-  const BASE_FEE_MAX_CHANGE_DENOMINATOR = 8n;
-
-  let expectedBaseFee;
-
-  if (parentGasUsed === targetGas) {
-    expectedBaseFee = parentBaseFee;
-  } else if (parentGasUsed > targetGas) {
-    const gasDelta = parentGasUsed - targetGas;
-    let delta = (parentBaseFee * gasDelta) / targetGas / BASE_FEE_MAX_CHANGE_DENOMINATOR;
-    if (delta < 1n) delta = 1n; // minimum increase of 1 wei
-    expectedBaseFee = parentBaseFee + delta;
-  } else {
-    const gasDelta = targetGas - parentGasUsed;
-    let delta = (parentBaseFee * gasDelta) / targetGas / BASE_FEE_MAX_CHANGE_DENOMINATOR;
-    expectedBaseFee = parentBaseFee - delta;
-  }
-
-  return {
-    valid: expectedBaseFee === childBaseFee,
-    expected: expectedBaseFee.toString(),
-    actual: childBaseFee.toString(),
-    parentBaseFee: parentBaseFee.toString(),
-    parentGasUsed: parentGasUsed.toString(),
-    parentGasLimit: parentGasLimit.toString(),
-    targetGas: targetGas.toString()
-  };
-}
-
-
-// EIP-1559 base fee calculation for next block
-function nextEIP1559BaseFee(parent) {
-  if (!parent.baseFeePerGas) {
-    return {
-      valid: false,
-      reason: "Missing base fee (possibly pre-EIP-1559 block?)"
-    };
-  }
-
-  const parentBaseFee = toBigInt(parent.baseFeePerGas);
-  const parentGasUsed = toBigInt(parent.gasUsed);
-  const parentGasLimit = toBigInt(parent.gasLimit);
-
-  const targetGas = parentGasLimit / 2n;
-  const BASE_FEE_MAX_CHANGE_DENOMINATOR = 8n;
-
-  let expectedBaseFee;
-
-  if (parentGasUsed === targetGas) {
-    expectedBaseFee = parentBaseFee;
-  } else if (parentGasUsed > targetGas) {
-    const gasDelta = parentGasUsed - targetGas;
-    let delta = (parentBaseFee * gasDelta) / targetGas / BASE_FEE_MAX_CHANGE_DENOMINATOR;
-    if (delta < 1n) delta = 1n; // minimum increase of 1 wei
-    expectedBaseFee = parentBaseFee + delta;
-  } else {
-    const gasDelta = targetGas - parentGasUsed;
-    let delta = (parentBaseFee * gasDelta) / targetGas / BASE_FEE_MAX_CHANGE_DENOMINATOR;
-    expectedBaseFee = parentBaseFee - delta;
-  }
-
-  return {
-    next: expectedBaseFee.toString()
   };
 }
