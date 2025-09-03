@@ -4,130 +4,80 @@ import rlp from 'rlp';
 
 export const BLOCK_TIME = 12; // seconds
 
+/** Utility: Check if string is an unsigned decimal integer */
 export function isDecimalUint(str) {
-  // Define a regular expression to match decimal unsigned integers
-  // ^ asserts the start of the string
-  // \d+ matches one or more digits
-  // $ asserts the end of the string
-  const decimalUintRegex = /^\d+$/;
-
-  // Test the string against the regular expression
-  return decimalUintRegex.test(str);
+  return /^\d+$/.test(str);
 }
 
+/** Utility: Check if string is a valid 32-byte hex (with or without 0x prefix) */
 export function isBytes32Hex(str) {
-  // Define a regular expression to match a valid bytes32 hexadecimal value
-  // ^ asserts the start of the string
-  // 0x? makes the "0x" prefix optional
-  // [0-9a-fA-F]{64} matches exactly 64 hexadecimal characters
-  // $ asserts the end of the string
-  const bytes32HexRegex = /^(0x)?[0-9a-fA-F]{64}$/;
-
-  // Test the string against the regular expression
-  return bytes32HexRegex.test(str);
+  return /^(0x)?[0-9a-fA-F]{64}$/.test(str);
 }
 
+/** Utility: Convert camelCase to human-readable string */
 export function camelToHuman(camelStr) {
   if (!camelStr) return '';
-
-  const words = camelStr
-    .replace(/([A-Z])/g, ' $1')     // insert space before uppercase letters
-    .toLowerCase();                 // convert entire string to lowercase
+  const words = camelStr.replace(/([A-Z])/g, ' $1').toLowerCase();
   return words.charAt(0).toUpperCase() + words.slice(1);
 }
 
 export async function getBlockByNumber(blockNumber) {
-  const method = "eth_getBlockByNumber"
-  const params = [blockNumber,false]
-  const block = await sendRequest(method,params)
-
-  return block
+  return await sendRequest('eth_getBlockByNumber', [blockNumber, false]);
 }
 
 export async function getBlockByHash(blockHash) {
-  const method = "eth_getBlockByHash"
-  const params = [blockHash,false]
-  const block = await sendRequest(method,params)
-
-  return block
+  return await sendRequest('eth_getBlockByHash', [blockHash, false]);
 }
 
 export async function getTransactionCount(ethAddress) {
-  const method = "eth_getTransactionCount"
-  const params = [ethAddress,"latest"]
-
-  const returnedData = await sendRequest(method,params)
-  const txCount = parseInt(returnedData)
-
-  return txCount
+  const result = await sendRequest('eth_getTransactionCount', [ethAddress, 'latest']);
+  return parseInt(result);
 }
 
 export async function getTransactionByHash(txHash) {
-  const method = "eth_getTransactionByHash"
-  const params = [txHash]
-
-  const returnedData = await sendRequest(method,params)
-  console.log(returnedData)
-
-  return returnedData
+  return await sendRequest('eth_getTransactionByHash', [txHash]);
 }
 
 export async function getBalance(ethAddress) {
-  const method = "eth_getBalance"
-  const params = [ethAddress,"latest"]
-
-  const returnedData = await sendRequest(method,params)
-  const balance = parseInt(returnedData)/ 10**18
-
-  return balance
+  const result = await sendRequest('eth_getBalance', [ethAddress, 'latest']);
+  return parseInt(result) / 10 ** 18;
 }
 
 export async function getBlockNumber() {
-  const method = "eth_blockNumber"
-  const params = []
-  const currentBlockNumber = await sendRequest(method,params)
-
-  return parseInt(currentBlockNumber)
+  const result = await sendRequest('eth_blockNumber', []);
+  return parseInt(result);
 }
 
 export async function getCode(ethAddress) {
-  const method = "eth_getCode"
-  const params = [ethAddress,"latest"]
-
-  const returnedData = await sendRequest(method,params)
-  const code = returnedData
-
-  return code
+  return await sendRequest('eth_getCode', [ethAddress, 'latest']);
 }
 
-export async function sendRequest(method,params) {
+/** JSON-RPC Request Sender */
+export async function sendRequest(method, params) {
   const jsonRpcRequest = {
-    jsonrpc: "2.0",
-    method: method,
-    params: params,
+    jsonrpc: '2.0',
+    method,
+    params,
     id: 2,
   };
 
   try {
-    const response = await fetch("http://127.0.0.1:8545", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+    const response = await fetch('http://127.0.0.1:8545', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(jsonRpcRequest),
     });
 
-    if (response.ok) {
-      const data = await response.json();
-      //console.log("Response:", data);
-      return data.result; // Return the data from the function
-    } else {
-      console.error("Error:", response.statusText);
-      return null; // Handle error case appropriately
+    if (!response.ok) {
+      console.error('RPC Error:', response.statusText);
+      return null;
     }
+
+    const data = await response.json();
+    return data.result;
   } catch (error) {
-    console.error("Error:", error.message);
-    return null; // Handle error case appropriately
+    console.error('Fetch Error:', error.message);
+    return null;
   }
 }
 
