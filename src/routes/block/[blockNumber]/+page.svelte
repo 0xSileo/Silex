@@ -57,26 +57,6 @@
 
   <!--<h1>Details for block {parseInt(data.block['number'])} </h1>-->
 
-  <table>
-    <thead>
-      <tr>
-        <th>Previous block</th>
-      </tr>
-    </thead>
-    <tbody>
-      <ul>
-        <tr>
-          <td> Number :</td>
-          <td>{previousBlockNumber}</td>
-        </tr>
-        <tr>
-          <td> Hash :</td>
-          <td>{data.block.parentHash}</td>
-        </tr>
-      </ul>
-    </tbody>
-  </table>
-
   {#if data.baseFeeCheck}
   <h3>Base Fee Verification</h3>
 
