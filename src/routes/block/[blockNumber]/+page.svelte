@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-  import { camelToHuman, BLOCK_TIME, hexToAscii } from '$lib/utils/utils';
+  import { camelToHuman, BLOCK_TIME, hexToAscii, refreshBlockData } from '$lib/utils/utils';
 
   export let data;
 
@@ -10,7 +10,12 @@
   let showLogsBloom = false;
 
   let etaTimestamp;
-  
+
+  async function refreshBlock(newBlockNumber) {
+    const newData = await refreshBlockData(newBlockNumber);
+    data = { ...data, ...newData }; 
+  }
+
     // Updating to latest block number with a websocket
     onMount(() => {
         const ws = new WebSocket('ws://127.0.0.1:8545');
@@ -24,10 +29,17 @@
         }));
         };
 
-        ws.onmessage = event => {
+        ws.onmessage = async (event) => {
         const msg = JSON.parse(event.data);
         if (msg.method === "eth_subscription") {
-            latestBlockNumber = parseInt(msg.params.result.number, 16);
+          const newBlockNumber = parseInt(msg.params.result.number, 16);
+          if (newBlockNumber > latestBlockNumber) {
+            latestBlockNumber = newBlockNumber;
+
+            if (data.requestedLatestBlock) {
+              await refreshBlock(newBlockNumber);
+            }
+          }
         }
         };
 
@@ -48,7 +60,7 @@
   }
 
   $: if (!blockInTheFuture && !data.block) {
-    location.reload();
+    refreshBlock(data.blockNumber);
   }
 
 </script>

@@ -57,6 +57,29 @@ export async function getCode(ethAddress) {
   return await sendRequest('eth_getCode', [ethAddress, 'latest']);
 }
 
+export async function refreshBlockData(newBlockNumber) {
+  const block = await getBlockByNumber(newBlockNumber);
+  const blockReceipts = await getBlockReceipts(newBlockNumber);
+
+  let baseFeeCheck = null;
+  if (newBlockNumber > 0) {
+    const parentBlock = await getBlockByNumber(newBlockNumber - 1);
+    baseFeeCheck = verifyBaseFeeEIP1559(parentBlock, block);
+  }
+
+  const nextBaseFee = nextEIP1559BaseFee(block);
+
+  return {
+    block,
+    blockNumber: newBlockNumber,
+    baseFeeCheck,
+    nextBaseFee,
+    blockReceipts,
+    currentBlock: block,
+    currentBlockNumber: newBlockNumber
+  };
+}
+
 /** JSON-RPC Request Sender */
 export async function sendRequest(method, params) {
   const jsonRpcRequest = {
