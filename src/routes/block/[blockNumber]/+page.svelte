@@ -134,7 +134,7 @@
             {#if data.blockNumber == 0}
               <td><a href="https://ethereum.stackexchange.com/questions/71804/what-is-the-meaning-of-ethereum-mainnet-genesis-block-extradata-value"><code>{value}</code></a></td>
             {:else}
-              <td>{hexToAscii(value)}</td>
+              <td>{value == "0x" ? "No extra data specified" : hexToAscii(value)}</td>
             {/if}
           {:else if key === 'baseFeePerGas'}
             <td>
