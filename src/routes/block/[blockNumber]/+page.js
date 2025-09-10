@@ -40,11 +40,12 @@ export async function load({ params }) {
   let baseFeeCheck = null;
   let nextBaseFee = null;
   let blockReceipts = null;
-  if (blockNumber > 0 && blockNumber <= currentBlockNumber ) {
-    const parentBlock = await getBlockByNumber(blockNumber - 1);
-    baseFeeCheck = verifyBaseFeeEIP1559(parentBlock, block);
+  if (blockNumber <= currentBlockNumber ) {
+    if (blockNumber > 0) {
+      const parentBlock = await getBlockByNumber(blockNumber - 1);
+      baseFeeCheck = verifyBaseFeeEIP1559(parentBlock, block);
+    }
     nextBaseFee = nextEIP1559BaseFee(block)
-    
     blockReceipts = await getBlockReceipts(blockNumber)
   }
 

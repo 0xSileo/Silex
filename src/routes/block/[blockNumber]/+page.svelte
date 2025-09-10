@@ -36,7 +36,7 @@
     });
 
   $: previousBlockNumber = data.blockNumber > 0 ? data.blockNumber - 1 : null
-  $: nextBlockNumber = previousBlockNumber + 2 <= latestBlockNumber ? previousBlockNumber + 2 : null
+  $: nextBlockNumber = data.blockNumber + 1 <= latestBlockNumber ? data.blockNumber + 1 : null
 
   $: blockInTheFuture = data.blockNumber > latestBlockNumber
 
@@ -58,6 +58,11 @@
   <p>Waiting for it to be mined... Current block is  <a href="/block/{latestBlockNumber}">{latestBlockNumber}</a>. If all slots are filled, the block should be mined on {new Date(etaTimestamp*1000)}</p>
 {:else}
   <h1>  {#if previousBlockNumber != null}<a href="/block/{previousBlockNumber}">&lt;</a>{/if}  Details for block {parseInt(data.blockNumber)}  {#if nextBlockNumber != null}<a href="/block/{nextBlockNumber}">&gt;</a> --- <a href="/block/latest">&gt;&gt;</a> {/if} </h1>
+
+
+  {#if data.blockNumber == 0}
+     <p style="color:blue">This is the genesis block which has no parent block, hence why the value of <code>parentHash</code> is zero. Additionnally, other values such as <code>miner</code> and <code>timestamp</code> were initialised as zero. The value of the <code>extraData</code> field is the hash of a block on a testnet, click the link at <code>extraData</code> for more info. This block distributes the initially available Ether following the ICO. More details about the genesis block can be found in <a href="https://blog.ethereum.org/2015/07/27/final-steps">this 2015 blog post</a> on the Ethereum website.</p>
+  {/if}
 
   <!--<h1>Details for block {parseInt(data.block['number'])} </h1>-->
   {#if nextBlockNumber == null}
@@ -126,20 +131,26 @@
           {:else if key === 'gasUsed'}
             <td>{parseInt(value)} ({(parseInt(value)/parseInt(data.block.gasLimit)*100).toFixed(2)} % of gas limit)</td>
           {:else if key === 'extraData'}
-            <td>{hexToAscii(value)}</td>
+            {#if data.blockNumber == 0}
+              <td><a href="https://ethereum.stackexchange.com/questions/71804/what-is-the-meaning-of-ethereum-mainnet-genesis-block-extradata-value"><code>{value}</code></a></td>
+            {:else}
+              <td>{hexToAscii(value)}</td>
+            {/if}
           {:else if key === 'baseFeePerGas'}
             <td>
               {parseInt(value)/10**9} gwei
+              {#if data.baseFeeCheck !== null}
                 {#if data.baseFeeCheck.valid} <span style="color: green">✅ Base fee is verified</span>
                 {:else}
                   <span style="color: red">
                     ❌ Couldn't be verified: predicted value is {parseInt(data.baseFeeCheck.expected)/1e9} gwei
                   </span>
                 {/if}
+              {/if}
             </td>
 
-          {:else if key === 'timestamp'}
-            <td>{new Date(parseInt(value) * 1000)}</td>
+          {:else if (key === 'timestamp' && data.blockNumber != 0)}
+              <td>{new Date(parseInt(value) * 1000)}</td>
 
              {:else if key === 'withdrawals'}
             <td>
