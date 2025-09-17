@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-  import { camelToHuman, BLOCK_TIME, hexToAscii, refreshBlockData } from '$lib/utils/utils';
+  import { camelToHuman, BLOCK_TIME, hexToAscii, refreshBlockData, ZERO_ADDRESS, ZERO_BYTES32 } from '$lib/utils/utils';
 
   export let data;
 
@@ -93,10 +93,10 @@
         <tr>
           <td>{camelToHuman(key)}</td>
 
-          {#if key === 'parentHash' && value !== '0x0000000000000000000000000000000000000000000000000000000000000000'}
+          {#if key === 'parentHash' && value !== ZERO_BYTES32}
             <td><code><a href="/block/{value}">{value}</a></code></td>
 
-          {:else if key === 'miner' && value !== '0x0000000000000000000000000000000000000000'}
+          {:else if key === 'miner' && value !== ZERO_ADDRESS}
             <td><code><a href="/address/{value}">{value}</a></code></td>
 
           {:else if key === 'logsBloom'}

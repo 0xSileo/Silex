@@ -3,6 +3,9 @@ import Keccak from 'keccak';
 import rlp from 'rlp';
 
 export const BLOCK_TIME = 12; // seconds
+export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
+export const ZERO_BYTES32 = '0x0000000000000000000000000000000000000000000000000000000000000000'
+
 const ENS_REGISTRY_ADDRESS = '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e'
 const ENS_NAME_QUERY_SIG = '0x691f3431' // name(bytes32)
 const ENS_RESOLVER_QUERY_SIG = '0x0178b8bf' // resolver(bytes32)
@@ -353,7 +356,7 @@ export async function resolveENSFromAddress(address) {
   const node = ENSNamehash(reverseName);
   const resolverContractAddress = await getENSResolverContractAddress(node);
 
-  if (!resolverContractAddress || resolverContractAddress === '0x0000000000000000000000000000000000') {
+  if (!resolverContractAddress || resolverContractAddress === ZERO_ADDRESS) {
     console.log('No resolver set for reverse record.');
     return null;
   }
