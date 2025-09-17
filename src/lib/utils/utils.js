@@ -3,6 +3,9 @@ import Keccak from 'keccak';
 import rlp from 'rlp';
 
 export const BLOCK_TIME = 12; // seconds
+const ENS_REGISTRY_ADDRESS = '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e'
+const ENS_NAME_QUERY_SIG = '0x691f3431' // name(bytes32)
+const ENS_RESOLVER_QUERY_SIG = '0x0178b8bf' // resolver(bytes32)
 
 /** Utility: Check if string is an unsigned decimal integer */
 export function isDecimalUint(str) {
@@ -281,4 +284,80 @@ export function verifyTransactionSignature(txObj) {
   } catch (error) {
     return { error: error.message };
   }
+}
+
+// ENS PRIMARY NAME RESOLVING UTILS
+
+export function ENSNamehash(name) {
+  let node = Buffer.alloc(32, 0); // 32 bytes of 0
+
+  if (name) {
+    const labels = name.split('.');
+    // Construct the node starting with highest i, hashing labels and updating node hash every time
+    for (let i = labels.length - 1; i >= 0; i--) {
+      const labelSha = Keccak('keccak256').update(labels[i]).digest();
+      node = Keccak('keccak256')
+        .update(Buffer.concat([node, labelSha]))
+        .digest();
+    }
+  }
+
+  return '0x' + node.toString('hex');
+}
+
+
+export async function getENSResolverContractAddress(node) {
+  const calldata = ENS_RESOLVER_QUERY_SIG + node.slice(2); // remove '0x'
+
+  const result = await sendRequest('eth_call', [
+    {
+      to: ENS_REGISTRY_ADDRESS,
+      data: calldata,
+    },
+    'latest',
+  ]);
+
+  return result ? '0x' + result.slice(26) : null;
+}
+
+
+export async function getPrimaryENSName(resolverContractAddress, node) {
+  const calldata = ENS_NAME_QUERY_SIG + node.slice(2);
+
+  const result = await sendRequest('eth_call', [
+    {
+      to: resolverContractAddress,
+      data: calldata
+    },
+    'latest',
+  ]);
+
+  if (!result) return null;
+
+  // Decode ABI-encoded string
+  const hex = result.slice(2);
+
+  const length = parseInt(hex.slice(64, 128), 16);
+  const strHex = hex.slice(128, 128 + length * 2);
+
+  const name = Buffer.from(strHex, 'hex').toString('utf8');
+
+  return name;
+}
+
+
+export async function resolveENSFromAddress(address) {
+  const normalized = address.toLowerCase().replace(/^0x/, '');
+  const reverseName = `${normalized}.addr.reverse`;
+
+  const node = ENSNamehash(reverseName);
+  const resolverContractAddress = await getENSResolverContractAddress(node);
+
+  if (!resolverContractAddress || resolverContractAddress === '0x0000000000000000000000000000000000') {
+    console.log('No resolver set for reverse record.');
+    return null;
+  }
+
+  const name = await getPrimaryENSName(resolverContractAddress, node);
+  return name;
 }
